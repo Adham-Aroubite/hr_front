@@ -93,7 +93,7 @@ export default function LandingPage() {
                 Login
               </Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/signup-choice">
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
                 Sign Up
               </Button>
@@ -225,7 +225,7 @@ export default function LandingPage() {
                             <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                               <div>
                                 <div className="font-medium text-gray-900">{app.role}</div>
-                                <div className="text-sm text-gray-500">{app.company}</div>
+                                <div className="text-sm text-gray-600">{app.company}</div>
                               </div>
                               <Badge
                                 className={

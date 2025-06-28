@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,7 +59,14 @@ export default function SignUpPage() {
               </Label>
             </div>
 
-            <Button className="w-full" size="lg">
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => {
+                // In a real app, create the company account
+                window.location.href = "/dashboard"
+              }}
+            >
               Create Account
             </Button>
 

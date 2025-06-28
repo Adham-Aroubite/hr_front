@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, Filter, Download, Tag, Briefcase } from "lucide-react"
+import Link from "next/link"
 
 export default function TalentPoolPage() {
   const candidates = [
@@ -265,9 +266,11 @@ export default function TalentPoolPage() {
                       <Button variant="ghost" size="sm">
                         <Briefcase className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
-                        View Profile
-                      </Button>
+                      <Link href={`/dashboard/candidates/${candidate.id}`}>
+                        <Button variant="ghost" size="sm">
+                          View Profile
+                        </Button>
+                      </Link>
                     </div>
                   </TableCell>
                 </TableRow>

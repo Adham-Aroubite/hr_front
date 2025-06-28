@@ -64,10 +64,13 @@ export default function JobOffersPage() {
           <h1 className="text-3xl font-bold text-gray-900">Job Offers</h1>
           <p className="text-muted-foreground mt-2">Manage all your job openings and track applications</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Create New Job Offer
-        </Button>
+        {/* CRITICAL: This Link component MUST navigate to /dashboard/jobs/new */}
+        <Link href="/dashboard/jobs/new">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create New Job Offer
+          </Button>
+        </Link>
       </div>
 
       {/* Filters */}
@@ -162,9 +165,11 @@ export default function JobOffersPage() {
                           <Eye className="h-4 w-4" />
                         </Button>
                       </Link>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/dashboard/jobs/${job.id}/edit`}>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                       <Button variant="ghost" size="sm">
                         <Archive className="h-4 w-4" />
                       </Button>
