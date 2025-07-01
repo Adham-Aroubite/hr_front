@@ -15,16 +15,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Target, LayoutDashboard, Briefcase, Users, Settings, Bell, Menu, X, LogOut, User } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Building2, Users, Briefcase, Settings, Menu, Bell, Search, Plus, Target, LogOut, User } from "lucide-react"
+import { Suspense } from "react"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Job Offers", href: "/dashboard/jobs", icon: Briefcase },
+  { name: "Dashboard", href: "/dashboard", icon: Building2 },
+  { name: "Jobs", href: "/dashboard/jobs", icon: Briefcase },
   { name: "Talent Pool", href: "/dashboard/talent", icon: Users },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
+
+function isActiveNavItem(pathname: string, href: string) {
+  if (href === "/dashboard") {
+    return pathname === "/dashboard"
+  }
+  return pathname === href || pathname.startsWith(href + "/")
+}
 
 export default function DashboardLayout({
   children,
@@ -35,117 +42,123 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar */}
-      <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
-          <div className="flex h-16 items-center justify-between px-4 border-b">
-            <div className="flex items-center space-x-2">
-              <Target className="h-6 w-6 text-blue-600" />
-              <span className="text-lg font-bold">TalentFlow</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                    isActive ? "bg-blue-100 text-blue-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                  )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
+    <Suspense fallback={null}>
+      <div className="min-h-screen bg-background">
+        {/* Mobile sidebar */}
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-64 p-0">
+            <div className="flex h-full flex-col">
+              {/* Logo */}
+              <div className="flex h-16 items-center border-b px-6">
+                <Link href="/" className="flex items-center space-x-2">
+                  <Target className="h-8 w-8 text-primary" />
+                  <span className="text-xl font-bold text-foreground">TalentFlow</span>
                 </Link>
-              )
-            })}
-          </nav>
-        </div>
-      </div>
+              </div>
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r">
-          <div className="flex h-16 items-center px-4 border-b">
-            <div className="flex items-center space-x-2">
-              <Target className="h-6 w-6 text-blue-600" />
-              <span className="text-lg font-bold">TalentFlow</span>
-            </div>
-          </div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                    isActive ? "bg-blue-100 text-blue-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                  )}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
-      </div>
+              {/* Navigation */}
+              <nav className="flex-1 space-y-1 px-3 py-4">
+                {navigation.map((item) => {
+                  const isActive = isActiveNavItem(pathname, item.href)
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </nav>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top header */}
-        <div className="sticky top-0 z-40 bg-white border-b">
-          <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center">
-              <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-                <Menu className="h-4 w-4" />
-              </Button>
-              <div className="ml-4 lg:ml-0">
-                <span className="text-lg font-semibold text-gray-900">TechCorp Inc.</span>
+              {/* User section */}
+              <div className="border-t p-4">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">John Doe</p>
+                    <p className="text-xs text-muted-foreground truncate">john@company.com</p>
+                  </div>
+                </div>
               </div>
             </div>
+          </SheetContent>
+        </Sheet>
 
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-4 w-4" />
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs">3</Badge>
-              </Button>
+        {/* Desktop sidebar */}
+        <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+          <div className="flex flex-col flex-grow bg-card border-r">
+            {/* Logo */}
+            <div className="flex h-16 items-center border-b px-6">
+              <Link href="/" className="flex items-center space-x-2">
+                <Target className="h-8 w-8 text-primary" />
+                <span className="text-xl font-bold text-foreground">TalentFlow</span>
+              </Link>
+            </div>
 
+            {/* Navigation */}
+            <nav className="flex-1 space-y-1 px-3 py-4">
+              {navigation.map((item) => {
+                const isActive = isActiveNavItem(pathname, item.href)
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {/* User section */}
+            <div className="border-t p-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" className="w-full justify-start p-0 h-auto">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-sm font-medium text-foreground truncate">John Doe</p>
+                        <p className="text-xs text-muted-foreground truncate">john@company.com</p>
+                      </div>
+                    </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">John Doe</p>
-                      <p className="text-xs leading-none text-muted-foreground">john@techcorp.com</p>
-                    </div>
-                  </DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
-                    <span>My Settings</span>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
+                    Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -153,9 +166,82 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1">{children}</main>
+        {/* Main content */}
+        <div className="lg:pl-64">
+          {/* Top bar */}
+          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="lg:hidden">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open sidebar</span>
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+
+            {/* Search */}
+            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+              <div className="relative flex flex-1 items-center">
+                <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-muted-foreground pl-3" />
+                <input
+                  className="block h-full w-full border-0 bg-transparent py-0 pl-10 pr-0 text-foreground placeholder:text-muted-foreground focus:ring-0 sm:text-sm"
+                  placeholder="Search..."
+                  type="search"
+                />
+              </div>
+            </div>
+
+            {/* Right side */}
+            <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <Button variant="ghost" size="sm">
+                <Bell className="h-5 w-5" />
+                <span className="sr-only">View notifications</span>
+              </Button>
+
+              <Link href="/dashboard/jobs/new">
+                <Button size="sm" className="bg-primary hover:bg-primary/90">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Post Job
+                </Button>
+              </Link>
+
+              {/* Profile dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {/* Page content */}
+          <main className="py-10">
+            <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </Suspense>
   )
 }

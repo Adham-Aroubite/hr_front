@@ -1,219 +1,286 @@
-import { Card, CardContent } from "@/components/ui/card"
+"use client"
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Calendar, MapPin, Clock } from "lucide-react"
+import { Progress } from "@/components/ui/progress"
+import { Briefcase, Eye, TrendingUp, Calendar, MapPin, Building } from "lucide-react"
+import Link from "next/link"
+
+// Mock data
+const stats = [
+  {
+    title: "Applications Sent",
+    value: "12",
+    change: "+3 this week",
+    icon: Briefcase,
+    color: "text-primary",
+  },
+  {
+    title: "Profile Views",
+    value: "48",
+    change: "+12 this week",
+    icon: Eye,
+    color: "text-accent",
+  },
+  {
+    title: "Interviews Scheduled",
+    value: "3",
+    change: "+1 this week",
+    icon: Calendar,
+    color: "text-primary",
+  },
+  {
+    title: "Response Rate",
+    value: "25%",
+    change: "+5% from last month",
+    icon: TrendingUp,
+    color: "text-accent",
+  },
+]
+
+const recentApplications = [
+  {
+    id: 1,
+    title: "Senior Frontend Developer",
+    company: "TechCorp Inc.",
+    location: "San Francisco, CA",
+    appliedDate: "2 days ago",
+    status: "Under Review",
+    statusColor: "bg-yellow-100 text-yellow-800",
+  },
+  {
+    id: 2,
+    title: "Product Manager",
+    company: "StartupXYZ",
+    location: "Remote",
+    appliedDate: "1 week ago",
+    status: "Interview Scheduled",
+    statusColor: "bg-blue-100 text-blue-800",
+  },
+  {
+    id: 3,
+    title: "UX Designer",
+    company: "Design Studio",
+    location: "New York, NY",
+    appliedDate: "2 weeks ago",
+    status: "Rejected",
+    statusColor: "bg-red-100 text-red-800",
+  },
+]
+
+const upcomingInterviews = [
+  {
+    id: 1,
+    title: "Product Manager",
+    company: "StartupXYZ",
+    date: "Tomorrow",
+    time: "2:00 PM",
+    type: "Video Call",
+    interviewer: "Sarah Johnson",
+  },
+  {
+    id: 2,
+    title: "Senior Frontend Developer",
+    company: "TechCorp Inc.",
+    date: "Friday",
+    time: "10:00 AM",
+    type: "On-site",
+    interviewer: "Mike Chen",
+  },
+]
+
+const recommendedJobs = [
+  {
+    id: 1,
+    title: "Full Stack Developer",
+    company: "InnovateTech",
+    location: "Austin, TX",
+    type: "Full-time",
+    match: 95,
+    posted: "1 day ago",
+  },
+  {
+    id: 2,
+    title: "React Developer",
+    company: "WebSolutions",
+    location: "Remote",
+    type: "Contract",
+    match: 88,
+    posted: "3 days ago",
+  },
+  {
+    id: 3,
+    title: "Frontend Engineer",
+    company: "CloudTech",
+    location: "Seattle, WA",
+    type: "Full-time",
+    match: 82,
+    posted: "1 week ago",
+  },
+]
 
 export default function CandidateDashboard() {
-  const applications = [
-    {
-      id: 1,
-      jobTitle: "Senior React Developer",
-      company: {
-        name: "TechCorp",
-        logo: "/placeholder.svg?height=40&width=40",
-      },
-      appliedDate: "2024-01-20",
-      status: "Interview Scheduled",
-      statusColor: "green",
-      location: "Remote",
-      timeline: [
-        { date: "2024-01-20", status: "Application Received", type: "received" },
-        { date: "2024-01-22", status: "Under Review", type: "review" },
-        { date: "2024-01-24", status: "Interview Scheduled", type: "interview" },
-      ],
-    },
-    {
-      id: 2,
-      jobTitle: "Product Manager",
-      company: {
-        name: "StartupXYZ",
-        logo: "/placeholder.svg?height=40&width=40",
-      },
-      appliedDate: "2024-01-18",
-      status: "Under Review",
-      statusColor: "yellow",
-      location: "San Francisco, CA",
-      timeline: [
-        { date: "2024-01-18", status: "Application Received", type: "received" },
-        { date: "2024-01-19", status: "Under Review", type: "review" },
-      ],
-    },
-    {
-      id: 3,
-      jobTitle: "UX Designer",
-      company: {
-        name: "DesignCo",
-        logo: "/placeholder.svg?height=40&width=40",
-      },
-      appliedDate: "2024-01-15",
-      status: "Application Received",
-      statusColor: "blue",
-      location: "New York, NY",
-      timeline: [{ date: "2024-01-15", status: "Application Received", type: "received" }],
-    },
-    {
-      id: 4,
-      jobTitle: "Frontend Developer",
-      company: {
-        name: "WebAgency",
-        logo: "/placeholder.svg?height=40&width=40",
-      },
-      appliedDate: "2024-01-10",
-      status: "Not Selected",
-      statusColor: "red",
-      location: "Remote",
-      timeline: [
-        { date: "2024-01-10", status: "Application Received", type: "received" },
-        { date: "2024-01-12", status: "Under Review", type: "review" },
-        { date: "2024-01-16", status: "Not Selected", type: "rejected" },
-      ],
-    },
-  ]
-
-  const getStatusBadgeClass = (color: string) => {
-    switch (color) {
-      case "green":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "yellow":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "blue":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "red":
-        return "bg-red-100 text-red-800 border-red-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Applications</h1>
-        <p className="text-gray-600 mt-2">Track the status of your job applications</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Welcome back, John!</h1>
+          <p className="text-muted-foreground">Here's your job search activity and recommendations.</p>
+        </div>
+        <Button asChild>
+          <Link href="/candidate/apply">
+            <Briefcase className="mr-2 h-4 w-4" />
+            Browse Jobs
+          </Link>
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Building2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Applications</p>
-                <p className="text-2xl font-bold text-gray-900">{applications.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Under Review</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {applications.filter((app) => app.status === "Under Review").length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Interviews</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {applications.filter((app) => app.status === "Interview Scheduled").length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Building2 className="h-6 w-6 text-red-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {applications.filter((app) => app.status === "Not Selected").length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Applications List */}
-      <div className="space-y-4">
-        {applications.map((application) => (
-          <Card key={application.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="h-6 w-6 text-gray-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900">{application.jobTitle}</h3>
-                    <p className="text-gray-600">{application.company.name}</p>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{application.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>Applied {new Date(application.appliedDate).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Badge className={getStatusBadgeClass(application.statusColor)}>{application.status}</Badge>
-              </div>
-
-              {/* Timeline */}
-              <div className="mt-6 pl-16">
-                <div className="space-y-3">
-                  {application.timeline.map((event, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div
-                        className={`h-2 w-2 rounded-full ${
-                          event.type === "received"
-                            ? "bg-blue-500"
-                            : event.type === "review"
-                              ? "bg-yellow-500"
-                              : event.type === "interview"
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                        }`}
-                      />
-                      <div className="flex-1 flex items-center justify-between">
-                        <span className="text-sm text-gray-700">{event.status}</span>
-                        <span className="text-xs text-gray-500">{new Date(event.date).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              <p className="text-xs text-muted-foreground">{stat.change}</p>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Recent Applications */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Applications</CardTitle>
+                <CardDescription>Track the status of your job applications</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/candidate/apply">View All</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentApplications.map((application) => (
+                <div key={application.id} className="flex items-start justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <h4 className="font-medium text-foreground">{application.title}</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Building className="h-4 w-4" />
+                      <span>{application.company}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>{application.location}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Applied {application.appliedDate}</p>
+                  </div>
+                  <Badge className={application.statusColor}>{application.status}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Interviews */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Interviews</CardTitle>
+            <CardDescription>Your scheduled interviews this week</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {upcomingInterviews.length > 0 ? (
+                upcomingInterviews.map((interview) => (
+                  <div key={interview.id} className="flex items-start gap-4 p-4 border rounded-lg">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                        <Calendar className="h-5 w-5 text-accent" />
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h4 className="font-medium text-foreground">{interview.title}</h4>
+                      <p className="text-sm text-muted-foreground">{interview.company}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>
+                          {interview.date} at {interview.time}
+                        </span>
+                        <span>•</span>
+                        <span>{interview.type}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Interviewer: {interview.interviewer}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                  <h3 className="mt-4 text-sm font-medium text-foreground">No interviews scheduled</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Keep applying to jobs to get interview opportunities.
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recommended Jobs */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Recommended for You</CardTitle>
+              <CardDescription>Jobs that match your skills and preferences</CardDescription>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/candidate/apply">View All Jobs</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {recommendedJobs.map((job) => (
+              <div key={job.id} className="p-4 border rounded-lg space-y-3">
+                <div>
+                  <h4 className="font-medium text-foreground">{job.title}</h4>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <Building className="h-4 w-4" />
+                    <span>{job.company}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>{job.location}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary">{job.type}</Badge>
+                  <span className="text-xs text-muted-foreground">{job.posted}</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">Match Score</span>
+                    <span className="text-sm text-accent font-medium">{job.match}%</span>
+                  </div>
+                  <Progress value={job.match} className="h-2" />
+                </div>
+                <Button className="w-full" size="sm">
+                  Apply Now
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,11 +16,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [activeTab, setActiveTab] = useState("candidate")
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const redirectUrl = searchParams.get("redirect")
 
   const handleLogin = () => {
     // In a real app, you would validate credentials here
     if (activeTab === "candidate") {
-      router.push("/candidate/dashboard")
+      if (redirectUrl) {
+        router.push(redirectUrl)
+      } else {
+        router.push("/candidate/dashboard")
+      }
     } else {
       router.push("/dashboard")
     }

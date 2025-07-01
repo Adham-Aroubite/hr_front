@@ -44,6 +44,7 @@ export default function CandidateApplyPage() {
   // Get job details from URL parameters
   const jobTitle = searchParams.get("jobTitle") || "Senior React Developer"
   const companyName = searchParams.get("company") || "TechCorp"
+  const jobId = searchParams.get("jobId") || "1"
 
   const handleCvUpload = () => {
     // Simulate CV upload and parsing
