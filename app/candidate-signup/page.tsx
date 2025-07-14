@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -7,25 +6,57 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Target, Eye, Chrome, Linkedin } from "lucide-react"
+import { Target, Eye, Chrome, Linkedin, AlertCircle } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function CandidateSignUpPage() {
   const [formData, setFormData] = useState({
-    fullName: "",
+    username: "",
     email: "",
+    firstName: "",
+    lastName: "",
     password: "",
+    confirmPassword: "",
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  
+  const { register } = useAuth()
   const router = useRouter()
 
-  const handleSignUp = () => {
-    // In a real app, create the candidate account
-    router.push("/candidate/dashboard")
-  }
+  const handleSignUp = async () => {
+    if (!formData.username || !formData.email || !formData.password || 
+        !formData.firstName || !formData.lastName) {
+      setError("Please fill in all fields")
+      return
+    }
 
-  const handleSocialSignUp = (provider: string) => {
-    // In a real app, handle social authentication
-    router.push("/candidate/dashboard")
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords don't match")
+      return
+    }
+
+    setLoading(true)
+    setError("")
+
+    try {
+      await register({
+        username: formData.username,
+        email: formData.email,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        password: formData.password,
+        password_confirm: formData.confirmPassword,
+        user_type: "CANDIDATE",
+      })
+      
+      router.push("/candidate/dashboard")
+    } catch (error: any) {
+      setError(error.message || "Registration failed")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -37,23 +68,56 @@ export default function CandidateSignUpPage() {
             <span className="text-2xl font-bold">TalentFlow</span>
           </Link>
         </div>
-
+        
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Create Your Candidate Account</CardTitle>
             <CardDescription className="text-center">Join to discover jobs and apply seamlessly</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {error && (
+              <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="fullName"
+                  id="username"
                   type="text"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="johndoe"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  disabled={loading}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="John"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -64,6 +128,7 @@ export default function CandidateSignUpPage() {
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  disabled={loading}
                 />
               </div>
 
@@ -76,6 +141,30 @@ export default function CandidateSignUpPage() {
                     placeholder="Create a secure password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    disabled={loading}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    disabled={loading}
                   />
                   <Button
                     type="button"
@@ -90,8 +179,13 @@ export default function CandidateSignUpPage() {
               </div>
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleSignUp}>
-              Create Account
+            <Button 
+              className="w-full" 
+              size="lg" 
+              onClick={handleSignUp}
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
 
             {/* Social Login Options */}
@@ -104,17 +198,17 @@ export default function CandidateSignUpPage() {
                   <span className="px-2 bg-white text-gray-500">Or continue with</span>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" className="w-full" onClick={() => handleSocialSignUp("google")}>
+                <Button variant="outline" className="w-full" disabled>
                   <Chrome className="mr-2 h-4 w-4" />
                   Google
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => handleSocialSignUp("linkedin")}>
+                <Button variant="outline" className="w-full" disabled>
                   <Linkedin className="mr-2 h-4 w-4" />
                   LinkedIn
                 </Button>
               </div>
+              <p className="text-xs text-center text-gray-500">Social login coming soon</p>
             </div>
 
             <div className="text-center text-sm text-muted-foreground">
@@ -123,7 +217,7 @@ export default function CandidateSignUpPage() {
                 Sign in
               </Link>
             </div>
-
+            
             <div className="text-center text-xs text-gray-500">
               By creating an account, you agree to our{" "}
               <Link href="/terms" className="text-blue-600 hover:text-blue-500">

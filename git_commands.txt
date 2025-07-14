@@ -11,3 +11,6 @@ git push origin main
 
 
 docker-compose up -d 
+
+
+pnpm dev

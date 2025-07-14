@@ -1,35 +1,44 @@
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Target, Eye } from "lucide-react"
+import { Target, Eye, AlertCircle } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [activeTab, setActiveTab] = useState("candidate")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  
+  const { login } = useAuth()
   const router = useRouter()
-  const searchParams = useSearchParams()
 
-  const redirectUrl = searchParams.get("redirect")
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Please fill in all fields")
+      return
+    }
 
-  const handleLogin = () => {
-    // In a real app, you would validate credentials here
-    if (activeTab === "candidate") {
-      if (redirectUrl) {
-        router.push(redirectUrl)
-      } else {
-        router.push("/candidate/dashboard")
-      }
-    } else {
-      router.push("/dashboard")
+    setLoading(true)
+    setError("")
+
+    try {
+      await login(email, password)
+      // Redirect will be handled by the auth context based on user type
+      const redirectPath = activeTab === "candidate" ? "/candidate/dashboard" : "/dashboard"
+      router.push(redirectPath)
+    } catch (error: any) {
+      setError(error.message || "Login failed")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -49,7 +58,13 @@ export default function LoginPage() {
             <CardDescription className="text-center">Sign in to your account</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Login Type Tabs */}
+            {error && (
+              <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="candidate">Candidate Login</TabsTrigger>
@@ -65,6 +80,7 @@ export default function LoginPage() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -76,6 +92,7 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
                     />
                     <Button
                       type="button"
@@ -88,23 +105,14 @@ export default function LoginPage() {
                     </Button>
                   </div>
                 </div>
-
-                <Button className="w-full" size="lg" onClick={handleLogin}>
-                  Sign In
+                <Button 
+                  className="w-full" 
+                  size="lg" 
+                  onClick={handleLogin}
+                  disabled={loading}
+                >
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
-
-                <div className="text-center">
-                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
-                    Forgot your password?
-                  </Link>
-                </div>
-
-                <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link href="/candidate-signup" className="text-blue-600 hover:text-blue-500 font-medium">
-                    Sign up
-                  </Link>
-                </div>
               </TabsContent>
 
               <TabsContent value="hr" className="space-y-4 mt-6">
@@ -116,6 +124,7 @@ export default function LoginPage() {
                     placeholder="you@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -127,6 +136,7 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
                     />
                     <Button
                       type="button"
@@ -139,25 +149,29 @@ export default function LoginPage() {
                     </Button>
                   </div>
                 </div>
-
-                <Button className="w-full" size="lg" onClick={handleLogin}>
-                  Sign In
+                <Button 
+                  className="w-full" 
+                  size="lg" 
+                  onClick={handleLogin}
+                  disabled={loading}
+                >
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
-
-                <div className="text-center">
-                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
-                    Forgot your password?
-                  </Link>
-                </div>
-
-                <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link href="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
-                    Sign up for business
-                  </Link>
-                </div>
               </TabsContent>
             </Tabs>
+
+            <div className="text-center">
+              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                Forgot your password?
+              </Link>
+            </div>
+            
+            <div className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <Link href="/candidate-signup" className="text-blue-600 hover:text-blue-500 font-medium">
+                Sign up
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

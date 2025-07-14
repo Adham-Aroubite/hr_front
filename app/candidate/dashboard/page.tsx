@@ -1,286 +1,192 @@
 "use client"
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Briefcase, Eye, TrendingUp, Calendar, MapPin, Building } from "lucide-react"
+import type React from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { LayoutDashboard, Briefcase, User, Settings, LogOut, Menu, X, Bell } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useAuth } from "@/contexts/AuthContext"
 
-// Mock data
-const stats = [
-  {
-    title: "Applications Sent",
-    value: "12",
-    change: "+3 this week",
-    icon: Briefcase,
-    color: "text-primary",
-  },
-  {
-    title: "Profile Views",
-    value: "48",
-    change: "+12 this week",
-    icon: Eye,
-    color: "text-accent",
-  },
-  {
-    title: "Interviews Scheduled",
-    value: "3",
-    change: "+1 this week",
-    icon: Calendar,
-    color: "text-primary",
-  },
-  {
-    title: "Response Rate",
-    value: "25%",
-    change: "+5% from last month",
-    icon: TrendingUp,
-    color: "text-accent",
-  },
+const navigation = [
+  { name: "Dashboard", href: "/candidate/dashboard", icon: LayoutDashboard },
+  { name: "Browse Jobs", href: "/candidate/apply", icon: Briefcase },
+  { name: "Profile", href: "/candidate/profile", icon: User },
+  { name: "Settings", href: "/candidate/settings", icon: Settings },
 ]
 
-const recentApplications = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "TechCorp Inc.",
-    location: "San Francisco, CA",
-    appliedDate: "2 days ago",
-    status: "Under Review",
-    statusColor: "bg-yellow-100 text-yellow-800",
-  },
-  {
-    id: 2,
-    title: "Product Manager",
-    company: "StartupXYZ",
-    location: "Remote",
-    appliedDate: "1 week ago",
-    status: "Interview Scheduled",
-    statusColor: "bg-blue-100 text-blue-800",
-  },
-  {
-    id: 3,
-    title: "UX Designer",
-    company: "Design Studio",
-    location: "New York, NY",
-    appliedDate: "2 weeks ago",
-    status: "Rejected",
-    statusColor: "bg-red-100 text-red-800",
-  },
-]
+export default function CandidateLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const pathname = usePathname()
+  const { user, logout } = useAuth()
+  const router = useRouter()
 
-const upcomingInterviews = [
-  {
-    id: 1,
-    title: "Product Manager",
-    company: "StartupXYZ",
-    date: "Tomorrow",
-    time: "2:00 PM",
-    type: "Video Call",
-    interviewer: "Sarah Johnson",
-  },
-  {
-    id: 2,
-    title: "Senior Frontend Developer",
-    company: "TechCorp Inc.",
-    date: "Friday",
-    time: "10:00 AM",
-    type: "On-site",
-    interviewer: "Mike Chen",
-  },
-]
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push("/login")
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
-const recommendedJobs = [
-  {
-    id: 1,
-    title: "Full Stack Developer",
-    company: "InnovateTech",
-    location: "Austin, TX",
-    type: "Full-time",
-    match: 95,
-    posted: "1 day ago",
-  },
-  {
-    id: 2,
-    title: "React Developer",
-    company: "WebSolutions",
-    location: "Remote",
-    type: "Contract",
-    match: 88,
-    posted: "3 days ago",
-  },
-  {
-    id: 3,
-    title: "Frontend Engineer",
-    company: "CloudTech",
-    location: "Seattle, WA",
-    type: "Full-time",
-    match: 82,
-    posted: "1 week ago",
-  },
-]
-
-export default function CandidateDashboard() {
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Welcome back, John!</h1>
-          <p className="text-muted-foreground">Here's your job search activity and recommendations.</p>
-        </div>
-        <Button asChild>
-          <Link href="/candidate/apply">
-            <Briefcase className="mr-2 h-4 w-4" />
-            Browse Jobs
-          </Link>
-        </Button>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* Recent Applications */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Recent Applications</CardTitle>
-                <CardDescription>Track the status of your job applications</CardDescription>
-              </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/candidate/apply">View All</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentApplications.map((application) => (
-                <div key={application.id} className="flex items-start justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <h4 className="font-medium text-foreground">{application.title}</h4>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Building className="h-4 w-4" />
-                      <span>{application.company}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      <span>{application.location}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Applied {application.appliedDate}</p>
-                  </div>
-                  <Badge className={application.statusColor}>{application.status}</Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Interviews */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Interviews</CardTitle>
-            <CardDescription>Your scheduled interviews this week</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {upcomingInterviews.length > 0 ? (
-                upcomingInterviews.map((interview) => (
-                  <div key={interview.id} className="flex items-start gap-4 p-4 border rounded-lg">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
-                        <Calendar className="h-5 w-5 text-accent" />
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <h4 className="font-medium text-foreground">{interview.title}</h4>
-                      <p className="text-sm text-muted-foreground">{interview.company}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>
-                          {interview.date} at {interview.time}
-                        </span>
-                        <span>•</span>
-                        <span>{interview.type}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">Interviewer: {interview.interviewer}</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <Calendar className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                  <h3 className="mt-4 text-sm font-medium text-foreground">No interviews scheduled</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Keep applying to jobs to get interview opportunities.
-                  </p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recommended Jobs */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Recommended for You</CardTitle>
-              <CardDescription>Jobs that match your skills and preferences</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/candidate/apply">View All Jobs</Link>
+    <div className="min-h-screen bg-background">
+      {/* Mobile sidebar */}
+      <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
+        <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed left-0 top-0 h-full w-64 bg-primary">
+          <div className="flex h-16 items-center justify-between px-4">
+            <h1 className="text-xl font-bold text-primary-foreground">Job Portal</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(false)}
+              className="text-primary-foreground hover:bg-primary/20"
+            >
+              <X className="h-5 w-5" />
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {recommendedJobs.map((job) => (
-              <div key={job.id} className="p-4 border rounded-lg space-y-3">
-                <div>
-                  <h4 className="font-medium text-foreground">{job.title}</h4>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                    <Building className="h-4 w-4" />
-                    <span>{job.company}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{job.location}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary">{job.type}</Badge>
-                  <span className="text-xs text-muted-foreground">{job.posted}</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground">Match Score</span>
-                    <span className="text-sm text-accent font-medium">{job.match}%</span>
-                  </div>
-                  <Progress value={job.match} className="h-2" />
-                </div>
-                <Button className="w-full" size="sm">
-                  Apply Now
-                </Button>
-              </div>
-            ))}
+          <nav className="mt-8 px-4">
+            <ul className="space-y-2">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                return (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-accent text-accent-foreground"
+                          : "text-primary-foreground/80 hover:bg-primary/20 hover:text-primary-foreground",
+                      )}
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-6">
+          <div className="flex h-16 shrink-0 items-center">
+            <h1 className="text-xl font-bold text-primary-foreground">Job Portal</h1>
           </div>
-        </CardContent>
-      </Card>
+          <nav className="flex flex-1 flex-col">
+            <ul className="flex flex-1 flex-col gap-y-7">
+              <li>
+                <ul className="space-y-1">
+                  {navigation.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={cn(
+                            "flex items-center gap-x-3 rounded-lg p-2 text-sm font-semibold leading-6 transition-colors",
+                            isActive
+                              ? "bg-accent text-accent-foreground"
+                              : "text-primary-foreground/80 hover:bg-primary/20 hover:text-primary-foreground",
+                          )}
+                        >
+                          <item.icon className="h-6 w-6 shrink-0" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-card px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-6 w-6" />
+          </Button>
+          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+            <div className="flex flex-1" />
+            <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <Button variant="ghost" size="sm">
+                <Bell className="h-5 w-5" />
+              </Button>
+              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-border" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                      <AvatarFallback>
+                        {user?.first_name?.[0]}{user?.last_name?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.first_name} {user?.last_name}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/candidate/profile">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/candidate/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </div>
+        {/* Page content */}
+        <main className="py-10">
+          <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+        </main>
+      </div>
     </div>
   )
 }
