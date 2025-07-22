@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Target, MapPin, Building2, Clock, ArrowRight } from "lucide-react"
 import { useEffect, useState } from "react"
-
+import { Eye, AlertCircle } from "lucide-react"  // Removed Target
+import { useAuth } from "@/contexts/AuthContext"
+import { Logo } from "@/components/logo"  // Added this import
 export default function LandingPage() {
   const [scrollY, setScrollY] = useState(0)
 
@@ -238,19 +240,16 @@ export default function LandingPage() {
         </svg>
       </div>
 
-      {/* Header */}
-      <header className="border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-50 relative">
-        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Target className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">TalentFlow</span>
-          </div>
-
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="#features"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
+          {/* Header */}
+          <header className="border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-50 relative">
+            <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
+              <Logo size="md" href="/" />
+              
+              <nav className="hidden md:flex items-center space-x-8">
+                <Link
+                  href="#features"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
               Features
             </Link>
             <Link
