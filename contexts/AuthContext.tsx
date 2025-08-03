@@ -1,6 +1,8 @@
+// ==== contexts/AuthContext.tsx (UPDATED VERSION) ====
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { api, User } from '@/lib/api'
 
 interface AuthContextType {
@@ -19,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     // Check if user is already logged in
@@ -40,6 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.login({ email, password })
       setUser(response.user)
+      
+      // Auto-redirect based on user type
+      if (response.user.profile.user_type === 'HR') {
+        router.push('/dashboard')
+      } else if (response.user.profile.user_type === 'CANDIDATE') {
+        router.push('/candidate/dashboard')
+      }
     } catch (error) {
       throw error
     }
@@ -49,6 +59,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await api.register(data)
       setUser(response.user)
+      
+      // Auto-redirect based on user type
+      if (response.user.profile.user_type === 'HR') {
+        router.push('/dashboard')
+      } else if (response.user.profile.user_type === 'CANDIDATE') {
+        router.push('/candidate/dashboard')
+      }
     } catch (error) {
       throw error
     }
@@ -62,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Logout error:', error)
     } finally {
       setUser(null)
+      router.push('/login')
     }
   }
 
